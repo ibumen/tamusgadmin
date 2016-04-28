@@ -1,0 +1,272 @@
+{% extends 'base.html.twig' %}
+{% macro clientlist(contentlist) %}
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr><th>S/N</th><th>Client Name</th><th>Site</th><th>Client Since:</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for item in contentlist %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td>{{item.getClientName()}}</td>
+                    <td>{{item.getClientSite()}}</td>
+                    <td>{{(item.getStartofrelation() is empty)?"-":item.getStartofrelation()|date('d/M/Y')}}</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm" id='modify' style="display:none;">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Modify
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm item" id='remove' data-id="{{item.getClientId()}}" data-type="client">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+{% macro partnerlist(contentlist) %}
+    <table class="table table-bordered table-condensed table-striped">
+        <thead>
+            <tr><th>S/N</th><th>Partner Name</th><th>Site</th><th>Partner Since:</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            {% for item in contentlist %}
+                <tr>
+                    <td>{{loop.index}}</td>
+                    <td>{{item.getPartnerName()}}</td>
+                    <td>{{item.getPartnerSite()}}</td>
+                    <td>{{(item.getStartofrelation() is empty)?"-":item.getStartofrelation()|date('d/M/Y')}}</td>
+                    <td>
+                        <button type="button" class="btn btn-info btn-sm" id='modify' style="display:none;">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Modify
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm item" id='remove' data-id="{{item.getPartnerId()}}" data-type="partner">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% block pagecontent %}
+    <div class="row"> 
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>Site Page <small>{{pagetitle}}</small></h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="col-md-12 col-sm-12 col-xs-12" id='viewmode'>
+                    {{sitecontent|raw}}
+                    <br />
+                    <button type="button" class="btn btn-default btn-sm" id='editbtn'>
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Edit
+                    </button>
+                </div>
+                <br />
+                <div class="col-md-12 col-sm-12 col-xs-12" id='editmode' style='display:none;'>
+                    {{form(form)}}
+                    <br />
+                    <button type="button" class="btn btn-default btn-sm" id='cancelbtn'>
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+                    </button>
+
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+    {% if (page == "partners") %}               
+        <div class="row"> 
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="dashboard_graph">
+
+                    <div class="row x_title">
+                        <div class="col-md-6">
+                            <h3>List of Partners</h3>
+                        </div>
+                        <div class="col-md-6">
+
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='partnerlist'>
+                        {% if contentlist is defined %}
+                            {% import _self as genlist %}
+                            {{ genlist.partnerlist(contentlist)}}
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">No Record Found!</div>
+                        {% endif %}
+                        <button type="button" class="btn btn-default btn-sm" id='addpbtn'>
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                        </button>
+
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='newpartner' style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+                                <h2>Add New Partner</h2>
+                                <div class="progress" id="progressbar" style="display:none;">
+                                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                                </div>
+                                <div class="alert alert-success" role="alert" id="addsuccess" style="display:none;">Partner added successfully!</div>
+                                <div class="alert alert-danger" role="alert" id="adderror" style="display:none;">Operation was not successful. Please check you input.</div>
+                                {{form(addpartnerform)}}
+                                <button type="button" class="btn btn-default btn-sm" id='canceladdbtn'>
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+                                </button>
+
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-6"></div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}    
+
+
+    {% if (page == "clients") %}               
+        <div class="row"> 
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="dashboard_graph">
+
+                    <div class="row x_title">
+                        <div class="col-md-6">
+                            <h3>List of Clients</h3>
+                        </div>
+                        <div class="col-md-6">
+
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='clientlist'>
+                        {% if contentlist is defined %}
+                            {% import _self as genlist %}
+                            {{ genlist.clientlist(contentlist)}}
+                        {% else %}
+                            <div class="alert alert-warning" role="alert">No Record Found!</div>
+                        {% endif %}
+                        <button type="button" class="btn btn-default btn-sm" id='addpbtn'>
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                        </button>
+
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='newclient' style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+                                <h2>Add New Client</h2>
+                                <div class="progress" id="progressbar" style="display:none;">
+                                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                                </div>
+                                <div class="alert alert-success" role="alert" id="addsuccess" style="display:none;">Client added successfully!</div>
+                                <div class="alert alert-danger" role="alert" id="adderror" style="display:none;">Operation was not successful. Please check you input.</div>
+                                {{form(addclientform)}}
+                                <button type="button" class="btn btn-default btn-sm" id='canceladdbtn'>
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+                                </button>
+
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-6"></div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+
+{% endblock %}
+{% block script %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/ckeditor.js')}}"></script>
+    <script type='text/javascript'>
+        CKEDITOR.replace('contentfrm_contentValue');
+        $(document).on("click", "#editbtn", function (event) {
+            $("#viewmode").hide();
+            $("#editmode").show();
+        });
+        $(document).on("click", "#cancelbtn", function (event) {
+            $("#editmode").hide();
+            $("#viewmode").show();
+        });
+        $(document).on("click", "#addpbtn", function (event) {
+            $("#newpartner, #newclient").show('slidedown');
+        });
+        $(document).on("click", "#canceladdbtn", function (event) {
+            $("#newpartner, #newclient").hide('slideup');
+        });
+
+        $(document).on("click", "#partnerfrm_Add, #clientfrm_Add", function (event) {
+            $("#progressbar").show();
+            $.ajax({
+                url: '{{path((page=='clients')?'addclient':'addpartner')}}',
+                type: 'POST',
+                data: $("#partnerfrm, #clientfrm").serialize()
+            }).done(function (msg) {
+                msg = msg - 0;
+                if (msg == 1) {
+                    $("#addsuccess").show();
+                    $("#adderror").hide();
+                    $("#partnerfrm, #clientfrm").trigger("reset");
+                    reloadList("{{(page=='clients')?'client':'partner'}}");
+                } else {
+                    $("#addsuccess").hide();
+                    $("#adderror").show();
+                }
+                $("#progressbar").hide();
+            });
+            return false;
+        });
+        function reloadList(item){
+            if(item == "client"){
+                d = "clientlist";
+            }else{
+                d = "partnerlist";
+            }
+            
+            $.ajax({
+                url:'{{path('ajaxreloadlist')}}',
+                type:'get',
+                data:{item:item}
+            }).done(function(msg){
+                $("#"+d).html(msg);
+            });
+        }
+        
+        $(document).on('click', '.item', function(event){
+        data_type= $(this).attr("data-type");
+        data_id= $(this).attr("data-id");
+        
+            if(data_type == "client"){
+                d = "clientlist";
+            }else{
+                d = "partnerlist";
+            }
+            
+            $.ajax({
+                url:'{{path('ajaxremoveitem')}}',
+                type:'get',
+                data:{itemtype:data_type, itemid:data_id}
+            }).done(function(msg){
+                $("#"+d).html(msg);
+            });
+        });
+    </script>
+{% endblock %}

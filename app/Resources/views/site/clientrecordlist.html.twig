@@ -1,0 +1,13 @@
+
+<div class="col-md-12 col-sm-12 col-xs-12" id='clientlist'>
+    {% if ((contentlist is defined) and (contentlist is not empty)) %}
+        {% import 'site/modify_page_content.html.twig' as genlist %}
+        {{ genlist.clientlist(contentlist)}}
+    {% else %}
+        <div class="alert alert-warning" role="alert">No Record Found!</div>
+    {% endif %}
+    <button type="button" class="btn btn-default btn-sm" id='addpbtn'>
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+    </button>
+</div>
+

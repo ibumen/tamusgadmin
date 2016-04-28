@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+{% block pagecontent %}           
+    <div class="row"> 
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>{{pagetitle}}</h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="col-md-12 col-sm-12 col-xs-12" id='partnerlist'>
+                    {% if tickets is not empty %}
+                        <table class="table table-bordered table-condensed table-striped">
+                            <thead>
+                                <tr><th>S/N</th><th>PNR</th><th>Ticket No.</th><th>Amount</th><th>Agent</th><th>Agent Comm.</th><th>Balance</th><th>Entry Date</th><th>Sales Personnel</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for ticket in tickets %}
+                                    <tr>
+                                        <td>{{loop.index}}</td>
+                                        <td>{{ticket.getPnr()}}</td>
+                                        <td>{{ticket.getTicketNo()}}</td>
+                                        <td>{{ticket.getAmount()}}</td>
+                                        <td>{{ticket.getAgent().getAgentFullName()}}</td>
+                                        <td>{{ticket.getAgentCommission()}}</td>
+                                        <td>{{ticket.getBalance()}}</td>
+                                        <td>{{ticket.getEntryDate()|date('d/M/Y')}}</td>
+                                        <td></td>
+                                        <td>
+                                            <button type="button" class="btn btn-info btn-sm" id='modify'>
+                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Modify
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm item" id='cancel' data-id="{{ticket.getTicketId()}}">
+                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm item" id='remove' data-id="{{ticket.getTicketId()}}">
+                                                <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">No Record Found!</div>
+                    {% endif %}
+                    <button type="button" class="btn btn-default btn-sm" id='addpbtn'>
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+                    </button>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block script %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/ckeditor.js')}}"></script>
+    <script type='text/javascript'>
+    </script>
+{% endblock %}
