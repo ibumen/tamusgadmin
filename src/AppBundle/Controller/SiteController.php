@@ -101,7 +101,7 @@ class SiteController extends Controller {
         }
         $em = $this->getDoctrine()->getManager()->getRepository("AppBundle:$ent");
         $recs = $em->findAll();
-        return $this->render('site/recordlist.html.twig', array("contentlist" => $recs));
+        return $this->render('site/'.$request->get("item").'recordlist.html.twig', array("contentlist" => $recs));
     }
 
     /**

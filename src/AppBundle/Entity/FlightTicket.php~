@@ -88,9 +88,9 @@ class FlightTicket {
     /**
      * @ORM\ManyToOne(targetEntity="ReservationSystem")
      * @ORM\JoinColumn(name="rsid", referencedColumnName="rsid")
-     */
+    
     private $reservationSystem;
-
+ */
     /**
      * Get ticketId
      *
@@ -245,6 +245,52 @@ class FlightTicket {
      */
     public function getBalance() {
         return $this->balance;
+    }
+
+    /**
+     * Set agent
+     *
+     * @param \AppBundle\Entity\Agent $agent
+     * @return FlightTicket
+     */
+    public function setAgent(\AppBundle\Entity\Agent $agent)
+    {
+        $this->agent = $agent;
+
+        return $this;
+    }
+
+    /**
+     * Get agent
+     *
+     * @return \AppBundle\Entity\Agent 
+     */
+    public function getAgent()
+    {
+        return $this->agent;
+    }
+
+    /**
+     * Set user
+     *
+     * @param \AppBundle\Entity\User $user
+     * @return FlightTicket
+     */
+    public function setUser(\AppBundle\Entity\User $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get user
+     *
+     * @return \AppBundle\Entity\User 
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
 }

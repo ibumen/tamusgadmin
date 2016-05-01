@@ -53,12 +53,12 @@ class Agent {
     private $otherName;
 
     /**
-     * @ORM\Column(name="email", type="string", length=100)
+     * @ORM\Column(name="email", type="string", length=100, nullable=true)
      */
     private $email;
 
     /**
-     * @ORM\Column(name="mobile", type="string", length=20)
+     * @ORM\Column(name="mobile", type="string", length=20, nullable=true)
      */
     private $mobile;
 
@@ -72,6 +72,10 @@ class Agent {
      */
     private $status;
 
+    public function __construct() {
+        $this->status = "active";
+        $this->dateCreated= new \DateTime();
+    }
     /**
      * Get agentId
      *

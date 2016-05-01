@@ -23,9 +23,9 @@ class FlightTicketType extends AbstractType {
         $builder->add("pnr", "text", array("label" => "PNR", "attr" => array("placeholder" => "Passenger Name Record")))
                 ->add("ticketNo", "text", array("label" => "Ticket No.", "attr" => array("placeholder" => "Ticket Number")))
                 ->add("status", "hidden", array("data" => "ok"))
-                ->add("amount", "text", array("label" => "Cost of Ticket", "attr" => array("placeholder" => "Cost of Ticket")))
-                ->add("agentCommission", "percent", array("scale"=>2, "type"=>"integer", "empty_data"=>0, "mapped"=>false, "label" => "Agent Commission", "attr" => array("placeholder" => "Agent Commission")))
-                ->add("agent", "entity", array('placeholder'=>'Choose an option','class' => 'AppBundle:Agent', "choice_label"=>function($agent){ return "[".$agent->getRegNo()."] ".$agent->getAgentFullName("s,f o");}))
+                ->add("amount", "number", array("label" => "Cost of Ticket", "attr" => array("placeholder" => "Cost of Ticket")))
+                ->add("agentcomm", "percent", array("scale"=>2, "type"=>"integer", "empty_data"=>0, "mapped"=>false, "label" => "Agent Commission", "attr" => array("placeholder" => "Agent Commission")))
+                ->add("agent", "entity", array('placeholder'=>'Choose an option','class' => 'AppBundle:Agent', "choice_label"=>function($agent){ return "[".$agent->getRegNo()."] ".$agent->getAgentFullName("S,f o");}))
                 ->add("Submit", "submit");
     }
 

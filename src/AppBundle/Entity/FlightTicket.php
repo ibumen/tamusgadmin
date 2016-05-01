@@ -88,9 +88,9 @@ class FlightTicket {
     /**
      * @ORM\ManyToOne(targetEntity="ReservationSystem")
      * @ORM\JoinColumn(name="rsid", referencedColumnName="rsid")
-     */
+    
     private $reservationSystem;
-
+ */
     /**
      * Get ticketId
      *
@@ -247,7 +247,6 @@ class FlightTicket {
         return $this->balance;
     }
 
-
     /**
      * Set agent
      *
@@ -294,26 +293,4 @@ class FlightTicket {
         return $this->user;
     }
 
-    /**
-     * Set reservationSystem
-     *
-     * @param \AppBundle\Entity\ReservationSystem $reservationSystem
-     * @return FlightTicket
-     */
-    public function setReservationSystem(\AppBundle\Entity\ReservationSystem $reservationSystem = null)
-    {
-        $this->reservationSystem = $reservationSystem;
-
-        return $this;
-    }
-
-    /**
-     * Get reservationSystem
-     *
-     * @return \AppBundle\Entity\ReservationSystem 
-     */
-    public function getReservationSystem()
-    {
-        return $this->reservationSystem;
-    }
 }

@@ -17,9 +17,9 @@
                 <div class="row">
                     <div class="col-md-12 col-sm-12 col-xs-12" id='partnerlist'>
                         {% if(formsuccess == true) %}
-                            <div class="alert alert-success" role="alert">Ticket Sale Added Successfully</div>
+                            <div class="alert alert-success" role="alert">Agent Created Successfully</div>
                             {% endif %}
-                        {{form(addticketform)}}
+                        {{form(addagentform)}}
                     </div>
                 </div>
                 <div class="clearfix"></div>
@@ -30,7 +30,6 @@
 {% endblock %}
 {% block script %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ asset('js/ckeditor.js')}}"></script>
     <script type='text/javascript'>
     </script>
 {% endblock %}

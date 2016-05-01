@@ -9,6 +9,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Description of User
@@ -20,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  * @ORM\Table(name="user")
  */
-class User {
+class User implements UserInterface, \Serializable {
 
     /**
      * @ORM\Id
@@ -40,18 +41,21 @@ class User {
     private $password;
 
     /**
-     * @ORM\OneToOne(targetEntity="UserDetail", mappedBy="userId")
+     * @ORM\OneToOne(targetEntity="UserDetail", mappedBy="user")
      */
     private $userDetail;
-    
+
+    public function __construct() {
+        $this->password = password_hash("default", PASSWORD_BCRYPT, ["cost" => 12]);
+    }
+
     /**
      * Get userid
      *
      * @return integer 
      */
-    public function getUserid()
-    {
-        return $this->userid;
+    public function getUserId() {
+        return $this->userId;
     }
 
     /**
@@ -60,8 +64,7 @@ class User {
      * @param string $username
      * @return User
      */
-    public function setUsername($username)
-    {
+    public function setUsername($username) {
         $this->username = $username;
 
         return $this;
@@ -72,8 +75,7 @@ class User {
      *
      * @return string 
      */
-    public function getUsername()
-    {
+    public function getUsername() {
         return $this->username;
     }
 
@@ -83,8 +85,7 @@ class User {
      * @param string $password
      * @return User
      */
-    public function setPassword($password)
-    {
+    public function setPassword($password) {
         $this->password = $password;
 
         return $this;
@@ -95,8 +96,7 @@ class User {
      *
      * @return string 
      */
-    public function getPassword()
-    {
+    public function getPassword() {
         return $this->password;
     }
 
@@ -106,8 +106,7 @@ class User {
      * @param \AppBundle\Entity\UserDetail $userDetail
      * @return User
      */
-    public function setUserDetail(\AppBundle\Entity\UserDetail $userDetail = null)
-    {
+    public function setUserDetail(\AppBundle\Entity\UserDetail $userDetail = null) {
         $this->userDetail = $userDetail;
 
         return $this;
@@ -118,8 +117,79 @@ class User {
      *
      * @return \AppBundle\Entity\UserDetail 
      */
-    public function getUserDetail()
-    {
+    public function getUserDetail() {
         return $this->userDetail;
     }
+
+    public function getUserFullName($format = "S, f o") {
+        $format_arr = str_split($format);
+        $output = "";
+        foreach ($format_arr as $ch) {
+            switch ($ch) {
+                case "S": {
+                        $output.=strtoupper($this->getUserDetail()->getLastName());
+                        break;
+                    }
+                case "s": {
+                        $output.=ucfirst(strtolower($this->getUserDetail()->getLastName()));
+                        break;
+                    }
+                case "F": {
+                        $output.=strtoupper($this->getUserDetail()->getFirstName());
+                        break;
+                    }
+                case "f": {
+                        $output.=ucfirst(strtolower($this->getUserDetail()->getFirstName()));
+                        break;
+                    }
+                case "O": {
+                        $output.=strtoupper($this->getUserDetail()->getOtherName());
+                        break;
+                    }
+                case "o": {
+                        $output.=ucfirst(strtolower($this->getUserDetail()->getOtherName()));
+                        break;
+                    }
+                default: {
+                        $output.=$ch;
+                    }
+            }
+        }
+        return $output;
+    }
+
+    public function getSalt() {
+        return null;
+    }
+
+    public function getRoles() {
+        return array('ROLE_ADMIN');
+    }
+
+    public function eraseCredentials() {
+        
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize() {
+        return serialize(array(
+            $this->userId,
+            $this->username,
+            $this->password,
+// see section on salt below
+// $this->salt,
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized) {
+        list (
+                $this->userId,
+                $this->username,
+                $this->password,
+// see section on salt below
+// $this->salt
+                ) = unserialize($serialized);
+    }
+
 }

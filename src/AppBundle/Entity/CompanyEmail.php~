@@ -73,4 +73,27 @@ class CompanyEmail {
         return $this->email;
     }
 
+
+    /**
+     * Set companyAddress
+     *
+     * @param \AppBundle\Entity\CompanyContact $companyAddress
+     * @return CompanyEmail
+     */
+    public function setCompanyAddress(\AppBundle\Entity\CompanyContact $companyAddress)
+    {
+        $this->companyAddress = $companyAddress;
+
+        return $this;
+    }
+
+    /**
+     * Get companyAddress
+     *
+     * @return \AppBundle\Entity\CompanyContact 
+     */
+    public function getCompanyAddress()
+    {
+        return $this->companyAddress;
+    }
 }

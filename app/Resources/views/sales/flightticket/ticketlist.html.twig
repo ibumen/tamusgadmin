@@ -26,22 +26,19 @@
                                         <td>{{loop.index}}</td>
                                         <td>{{ticket.getPnr()}}</td>
                                         <td>{{ticket.getTicketNo()}}</td>
-                                        <td>{{ticket.getAmount()}}</td>
+                                        <td>{{ticket.getAmount()|number_format(2,'.',',')}}</td>
                                         <td>{{ticket.getAgent().getAgentFullName()}}</td>
-                                        <td>{{ticket.getAgentCommission()}}</td>
-                                        <td>{{ticket.getBalance()}}</td>
+                                        <td>{{ticket.getAgentCommission()|number_format(2,'.',',')}}</td>
+                                        <td>{{ticket.getBalance()|number_format(2,'.',',')}}</td>
                                         <td>{{ticket.getEntryDate()|date('d/M/Y')}}</td>
-                                        <td></td>
+                                        <td>{{ticket.getUser().getUserFullName()}}</td>
                                         <td>
                                             <button type="button" class="btn btn-info btn-sm" id='modify'>
-                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Modify
+                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                             </button>
-                                            <button type="button" class="btn btn-danger btn-sm item" id='cancel' data-id="{{ticket.getTicketId()}}">
-                                                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm item" id='remove' data-id="{{ticket.getTicketId()}}">
-                                                <span class="glyphicon glyphicon-remove-sign" aria-hidden="true"></span> Delete
-                                            </button>
+                                            <a href="{{path('removeflightticket', {'id': ticket.getticketId()})}}" class="btn btn-danger btn-sm" id='remove'>
+                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -50,9 +47,9 @@
                     {% else %}
                         <div class="alert alert-warning" role="alert">No Record Found!</div>
                     {% endif %}
-                    <button type="button" class="btn btn-default btn-sm" id='addpbtn'>
+                    <a href="{{path('addflightticket')}}" class="btn btn-default btn-sm">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
-                    </button>
+                    </a>
 
                 </div>
                 <div class="clearfix"></div>

@@ -180,4 +180,27 @@ class BalancedAccount {
         return $this->adjustedSalesAmount;
     }
 
+
+    /**
+     * Set balancedBy
+     *
+     * @param \AppBundle\Entity\User $balancedBy
+     * @return BalancedAccount
+     */
+    public function setBalancedBy(\AppBundle\Entity\User $balancedBy)
+    {
+        $this->balancedBy = $balancedBy;
+
+        return $this;
+    }
+
+    /**
+     * Get balancedBy
+     *
+     * @return \AppBundle\Entity\User 
+     */
+    public function getBalancedBy()
+    {
+        return $this->balancedBy;
+    }
 }

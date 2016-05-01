@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+{% block pagecontent %}           
+    <div class="row"> 
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>{{pagetitle}}</h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="col-md-12 col-sm-12 col-xs-12" id='partnerlist'>
+                    {% if agents is not empty %}
+                        <table class="table table-bordered table-condensed table-striped">
+                            <thead>
+                                <tr><th>S/N</th><th>Full Name</th><th>Date Created</th><th>Status</th><th>Action</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for agent in agents %}
+                                    <tr>
+                                        <td>{{loop.index}}</td>
+                                        <td>{{agent.getAgentFullName('s, f o')}}</td>
+                                        <td>{{agent.getDateCreated()|date('d/M/Y')}}</td>
+                                        <td>{{agent.getStatus()|capitalize}}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm" id='view'>
+                                                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> 
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm" id='edit'>
+                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> 
+                                            </button>
+                                            <button type="button" class="btn btn-info btn-sm" id='togglestatus'>
+                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {{(agent.getStatus()=='active')?('Deactivate'):('Activate')}}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">No Record Found!</div>
+                    {% endif %}
+                    <a href="{{path('createagent')}}" class="btn btn-default btn-sm">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add New Agent
+                    </a>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block script %}
+    {{ parent() }}
+    <script type='text/javascript'>
+    </script>
+{% endblock %}
