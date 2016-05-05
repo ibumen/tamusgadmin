@@ -49,6 +49,17 @@ class User implements UserInterface, \Serializable {
         $this->password = password_hash("default", PASSWORD_BCRYPT, ["cost" => 12]);
     }
 
+    public function toggleStatus() {
+        if ($this->getUserDetail()->getStatus() == "active") {
+            $this->getUserDetail()->setStatus("dormant");
+        } else if ($this->getUserDetail()->getStatus() == "dormant") {
+            $this->getUserDetail()->setStatus("active");
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Get userid
      *

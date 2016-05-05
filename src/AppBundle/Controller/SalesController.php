@@ -32,14 +32,8 @@ class SalesController extends Controller {
         $flightticket = new FlightTicket();
         $form = $this->createForm(new FlightTicketType(), $flightticket);
         $form->handleRequest($request);
+        $flightticket->setUser($this->getUser());
         if ($form->isSubmitted() && $form->isValid()) {
-            $amt = $flightticket->getAmount();
-            $perc = $form->get("agentcomm")->getData();
-            $flightticket->setAgentCommission((($perc / 100) * $amt));
-            $flightticket->setUser($rep->find(1));
-            $flightticket->setBalance($flightticket->getAmount() - $flightticket->getAgentCommission());
-            $flightticket->setEntryDate(new \DateTime());
-            $flightticket->setUser($this->getUser());
             $em->persist($flightticket);
             $em->flush();
             $form = $this->createForm(new FlightTicketType(), new FlightTicket());
@@ -55,10 +49,17 @@ class SalesController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $rep = $em->getRepository("AppBundle:FlightTicket");
         $ticket = $rep->find($id);
-        if($ticket != NULL){
-        $em->remove($ticket);
-        $em->flush();
+        if ($ticket != NULL) {
+            $em->remove($ticket);
+            $em->flush();
         }
+        return $this->redirectToRoute("listflightticket");
+    }
+
+    /**
+     * @Route("/sales/flight/ticket/dummy/{id}", name="f")
+     */
+    public function dummyController(Request $request, $id) {
         return $this->redirectToRoute("listflightticket");
     }
 

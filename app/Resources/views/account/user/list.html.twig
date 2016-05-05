@@ -22,19 +22,19 @@
                             </thead>
                             <tbody>
                                 {% for user in users %}
-                                    <tr>
+                                    <tr id="user{{user.getUserId()}}">
                                         <td>{{loop.index}}</td>
                                         <td>{{user.getUserFullName('s, f o')}}</td>
                                         <td>{{user.getUserDetail().getDateCreated()|date('d/M/Y')}}</td>
-                                        <td>{{user.getUserDetail().getStatus()|capitalize}}</td>
+                                        <td id="statustxt{{user.getUserId()}}">{{user.getUserDetail().getStatus()|humanize|capitalize}}</td>
                                         <td>
-                                            {% if(user.getUserDetail().getStatus()!='notready') %}
-                                            <button type="button" class="btn btn-info btn-sm" id='togglestatus'>
-                                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {{(user.getUserDetail().getStatus()=='active')?('Deactivate'):('Activate')}}
-                                            </button>
+                                            {% if(user.getUserDetail().getStatus()!='not_ready') %}
+                                                <button type="button" class="btn btn-info btn-sm togglestatus" data-userid = "{{user.getUserId()}}">
+                                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span id="statusaction{{user.getUserId()}}">{{(user.getUserDetail().getStatus()=='active')?('Deactivate'):('Activate')}}</span>
+                                                </button>
                                             {% endif %}
-                                            {% if(user.getUserDetail().getStatus()=='notready') %}
-                                                <button type="button" class="btn btn-danger btn-sm" id='remove'>
+                                            {% if(user.getUserDetail().getStatus()=='not_ready') %}
+                                                <button type="button" class="btn btn-danger btn-sm remove" data-userid = "{{user.getUserId()}}">
                                                     <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> 
                                                 </button>
                                             {% endif %}
@@ -60,5 +60,39 @@
 {% block script %}
     {{ parent() }}
     <script type='text/javascript'>
+        $(document).on("click", ".togglestatus", function (event) {
+            userid = $(this).attr("data-userid");
+            curstatus = $("#statusaction" + userid).text();
+            $("#statusaction" + userid).text("toggling...");
+            $.ajax({
+                type: 'GET',
+                url: '{{path('toggleuserstatus')}}',
+                data: {userid: userid}
+            }).done(function (data) {
+                data = data - 0;
+                if (data == 0) {
+                    $("#statusaction" + userid).text(curstatus);
+                } else {
+                    $("#statusaction" + userid).text((curstatus == "Activate") ? ("Deactivate") : ("Activate"));
+                    $("#statustxt" + userid).text((curstatus == "Activate") ? ("Active") : ("Dormant"));
+                }
+            });
+        });
+        
+        $(document).on("click", ".remove", function (event) {
+            userid = $(this).attr("data-userid");
+            $.ajax({
+                type: 'GET',
+                url: '{{path('removeuser')}}',
+                data: {userid: userid}
+            }).done(function (data) {
+                data = data - 0;
+                if (data == 0) {
+                    alert("Operation Unsuccessful!");
+                } else {
+                    $("#user" + userid).remove();
+                }
+            });
+        });
     </script>
 {% endblock %}

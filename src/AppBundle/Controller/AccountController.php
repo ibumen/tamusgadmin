@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\Agent;
 use AppBundle\Form\Type\AgentType;
 use AppBundle\Entity\User;
@@ -49,6 +50,7 @@ class AccountController extends Controller {
      * @Route("/account/logout", name="logout")
      */
     public function logoutAction(Request $request) {
+        
     }
 
     /**
@@ -121,11 +123,51 @@ class AccountController extends Controller {
     /**
      * @Route("/account/user/list", name="listuser")
      */
-    public function listAction(Request $request) {
+    public function listUserAction(Request $request) {
         $em = $this->getDoctrine();
         $rep = $em->getRepository("AppBundle:User");
         $users = $rep->findAll();
         return $this->render("account/user/list.html.twig", array("users" => $users, "pagetitle" => "List of Users"));
+    }
+
+    /**
+     * @Route("/account/user/toggleuserstatus", name="toggleuserstatus")
+     */
+    public function toggleUserStatusAction(Request $request) {
+        if ($request->isXmlHttpRequest()) {
+            $userid = $request->get('userid');
+            $em = $this->getDoctrine()->getManager();
+            $rep = $em->getRepository("AppBundle:User");
+            $user = $rep->find($userid);
+            if ($user == null || $user->toggleStatus() == false) {
+                return new Response("0");
+            }
+            $em->flush();
+            return new Response("1");
+        } else {
+            return $this->redirectToRoute("homepage");
+        }
+    }
+    
+    /**
+     * @Route("/account/user/removeuser", name="removeuser")
+     */
+    public function removeUserAction(Request $request) {
+        //if ($request->isXmlHttpRequest()) {
+            $userid = $request->get('userid');
+            $em = $this->getDoctrine()->getManager();
+            $rep = $em->getRepository("AppBundle:User");
+            $user = $rep->find($userid);
+            if ($user == null || $user->getUserDetail()->getStatus() != "not_ready") {
+                return new Response("0");
+            }
+            $em->remove($user->getUserDetail());
+            $em->remove($user);
+            $em->flush();
+            return new Response("1");
+       // } else {
+      //      return $this->redirectToRoute("homepage");
+       // }
     }
 
 }

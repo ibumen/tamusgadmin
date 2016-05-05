@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UserDetail {
     /* Constants for Status */
 
-    const STATUS = array("active", "dormant", "notready");
+    const STATUS = array("active", "dormant", "not_ready");
 
     /**
      * @ORM\Id
@@ -64,7 +64,7 @@ class UserDetail {
     private $status;
 
     public function __construct() {
-        $this->status="notready";
+        $this->status="not_ready";
         $this->dateCreated= new \DateTime();
     }
     /**

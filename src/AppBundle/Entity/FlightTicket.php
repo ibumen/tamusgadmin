@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class FlightTicket {
     /* Constants for Enum type */
 
-    const STATUS = array("ok", "cancelled");
+    const STATUS = array("not_paid", "part_paid", "paid", "refunded");
 
     /**
      * @ORM\Id
@@ -43,30 +43,44 @@ class FlightTicket {
     private $ticketNo;
 
     /**
-     * @ORM\Column(name="status", type="string", length=10, options={"default":"ok"})
+     * @ORM\Column(name="status", type="string", length=10, options={"default":"not_paid"})
      */
     private $status;
 
     /**
-     * @ORM\Column(name="amount", type="decimal", precision=11, scale=4)
+     * @ORM\Column(name="fare", type="decimal", precision=11, scale=4)
      */
-    private $amount;
-
-    /*
-     * @ORM\Column(name="commission", type="decimal", precision=11, scale=4)
-
-      private $commission;
-     */
+    private $fare;
 
     /**
-     * @ORM\Column(name="agentcommission", type="decimal", precision=11, scale=4, options={"default":0})
+     * @ORM\Column(name="commission", type="decimal", precision=5, scale=2, options={"default":0})
      */
-    private $agentCommission;
+    private $commission;
 
     /**
-     * @ORM\Column(name="balance", type="decimal", precision=11, scale=4)
+     * @ORM\Column(name="witholding_tax", type="decimal", precision=5, scale=2, options={"default":0})
      */
-    private $balance;
+    private $witholdingTax;
+
+    /**
+     * @ORM\Column(name="leadway_fee", type="decimal", precision=11, scale=4)
+     */
+    private $leadwayFee;
+
+    /**
+     * @ORM\Column(name="amount_due", type="decimal", precision=11, scale=4)
+     */
+    private $amountDue;
+
+    /**
+     * @ORM\Column(name="amount_paid", type="decimal", precision=11, scale=4, options={"default":0})
+     */
+    private $amountPaid;
+
+    /**
+     * @ORM\Column(name="service_charge", type="decimal", precision=11, scale=4, options={"default":0})
+     */
+    private $serviceCharge;
 
     /**
      * @ORM\Column(name="entry_date", type="datetime")
@@ -75,22 +89,26 @@ class FlightTicket {
 
     /**
      * @ORM\ManyToOne(targetEntity="Agent")
-     * @ORM\JoinColumn(name="agentid", referencedColumnName="agentid", nullable=false)
+     * @ORM\JoinColumn(name="agentid", referencedColumnName="agentid", nullable=true)
      */
     private $agent;
-    
+
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="userid", referencedColumnName="userid", nullable=false)
      */
     private $user;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="ReservationSystem")
-     * @ORM\JoinColumn(name="rsid", referencedColumnName="rsid")
-    
-    private $reservationSystem;
- */
+    public function __construct() {
+        $this->status = "not_paid";
+        $this->entryDate = new \DateTime();
+        $this->amountDue = 0;
+        $this->amountPaid = 0;
+        $this->witholdingTax = 0;
+        $this->commission = 0;
+        $this->serviceCharge = 0;
+    }
+
     /**
      * Get ticketId
      *
@@ -149,9 +167,12 @@ class FlightTicket {
      * @return FlightTicket
      */
     public function setStatus($status) {
-        $this->status = $status;
-
-        return $this;
+        if (in_array($status, self::STATUS)) {
+            $this->status = $status;
+            return $this;
+        } else {
+            throw new Exception("Invalid Ticket Status.");
+        }
     }
 
     /**
@@ -161,48 +182,6 @@ class FlightTicket {
      */
     public function getStatus() {
         return $this->status;
-    }
-
-    /**
-     * Set amount
-     *
-     * @param string $amount
-     * @return FlightTicket
-     */
-    public function setAmount($amount) {
-        $this->amount = $amount;
-
-        return $this;
-    }
-
-    /**
-     * Get amount
-     *
-     * @return string 
-     */
-    public function getAmount() {
-        return $this->amount;
-    }
-
-    /**
-     * Set agentCommission
-     *
-     * @param string $agentCommission
-     * @return FlightTicket
-     */
-    public function setAgentCommission($agentCommission) {
-        $this->agentCommission = $agentCommission;
-
-        return $this;
-    }
-
-    /**
-     * Get agentCommission
-     *
-     * @return string 
-     */
-    public function getAgentCommission() {
-        return $this->agentCommission;
     }
 
     /**
@@ -227,34 +206,12 @@ class FlightTicket {
     }
 
     /**
-     * Set balance
-     *
-     * @param string $balance
-     * @return FlightTicket
-     */
-    public function setBalance($balance) {
-        $this->balance = $balance;
-
-        return $this;
-    }
-
-    /**
-     * Get balance
-     *
-     * @return string 
-     */
-    public function getBalance() {
-        return $this->balance;
-    }
-
-    /**
      * Set agent
      *
      * @param \AppBundle\Entity\Agent $agent
      * @return FlightTicket
      */
-    public function setAgent(\AppBundle\Entity\Agent $agent)
-    {
+    public function setAgent(\AppBundle\Entity\Agent $agent) {
         $this->agent = $agent;
 
         return $this;
@@ -265,8 +222,7 @@ class FlightTicket {
      *
      * @return \AppBundle\Entity\Agent 
      */
-    public function getAgent()
-    {
+    public function getAgent() {
         return $this->agent;
     }
 
@@ -276,8 +232,7 @@ class FlightTicket {
      * @param \AppBundle\Entity\User $user
      * @return FlightTicket
      */
-    public function setUser(\AppBundle\Entity\User $user)
-    {
+    public function setUser(\AppBundle\Entity\User $user) {
         $this->user = $user;
 
         return $this;
@@ -288,9 +243,180 @@ class FlightTicket {
      *
      * @return \AppBundle\Entity\User 
      */
-    public function getUser()
-    {
+    public function getUser() {
         return $this->user;
+    }
+
+    /**
+     * Set fare
+     *
+     * @param string $fare
+     * @return FlightTicket
+     */
+    public function setFare($fare) {
+        $this->fare = $fare;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get fare
+     *
+     * @return string 
+     */
+    public function getFare() {
+        return $this->fare;
+    }
+
+    /**
+     * Set commission
+     *
+     * @param string $commission
+     * @return FlightTicket
+     */
+    public function setCommission($commission) {
+        $this->commission = $commission;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get commission
+     *
+     * @return string 
+     */
+    public function getCommission() {
+        return $this->commission;
+    }
+
+    /**
+     * Set witholdingTax
+     *
+     * @param string $witholdingTax
+     * @return FlightTicket
+     */
+    public function setWitholdingTax($witholdingTax) {
+        $this->witholdingTax = $witholdingTax;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get witholdingTax
+     *
+     * @return string 
+     */
+    public function getWitholdingTax() {
+        return $this->witholdingTax;
+    }
+
+    /**
+     * Set leadwayFee
+     *
+     * @param string $leadwayFee
+     * @return FlightTicket
+     */
+    public function setLeadwayFee($leadwayFee) {
+        $this->leadwayFee = $leadwayFee;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get leadwayFee
+     *
+     * @return string 
+     */
+    public function getLeadwayFee() {
+        return $this->leadwayFee;
+    }
+
+    /**
+     * Set amountDue
+     *
+     * @param string $amountDue
+     * @return FlightTicket
+     */
+    public function setAmountDue($amountDue) {
+        $this->amountDue = $amountDue;
+
+        return $this;
+    }
+
+    /**
+     * Get amountDue
+     *
+     * @return string 
+     */
+    public function getAmountDue() {
+        return $this->amountDue;
+    }
+
+    /**
+     * Set amountPaid
+     *
+     * @param string $amountPaid
+     * @return FlightTicket
+     */
+    public function setAmountPaid($amountPaid) {
+        if($this->status=="refunded"){
+            return $this;
+        }
+        $status = "not-paid";
+        $this->amountPaid += $amountPaid;
+        if($this->amountPaid==0){
+            $status = "not-paid";
+        }else
+        if($this->getAmountDue()>$this->getAmountPaid()){
+            $status = "part-paid";
+        }else{
+            $status = "paid";
+        }
+        $this->setStatus($status);
+
+        return $this;
+    }
+
+    /**
+     * Get amountPaid
+     *
+     * @return string 
+     */
+    public function getAmountPaid() {
+        return $this->amountPaid;
+    }
+
+    /**
+     * Set serviceCharge
+     *
+     * @param string $serviceCharge
+     * @return FlightTicket
+     */
+    public function setServiceCharge($serviceCharge) {
+        $this->serviceCharge = $serviceCharge;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get serviceCharge
+     *
+     * @return string 
+     */
+    public function getServiceCharge() {
+        return $this->serviceCharge;
+    }
+
+    public function computeAmountDue() {
+        $fare = $this->getFare();
+        if ($fare == 0) {
+            $this->setAmountDue(0);
+        }
+        $commission = (($this->getCommission() / 100) * $fare);
+        $serviceCharge = $this->getServiceCharge();
+        $witholding = (($this->getWitholdingTax() / 100) * $commission);
+        $leadway = $this->getLeadwayFee();
+        $this->setAmountDue($fare + $commission + $serviceCharge + $witholding + $leadway);
     }
 
 }
