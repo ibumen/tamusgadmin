@@ -21,6 +21,7 @@
                                 <tr>
                                     <th>S/N</th>
                                     <th>Tkt No./PNR</th>
+                                    <th>Cost of Tk</th>
                                     <th>Fare</th>
                                     <!--<th>Agent</th>-->
                                     <th>Commission</th>
@@ -39,8 +40,9 @@
                                     <tr>
                                         <td>{{loop.index}}</td>
                                         <td>{{ticket.getTicketNo()}}/{{ticket.getPnr()}}</td>
+                                        <td>{{ticket.getTicketCost()|number_format(2,'.',',')}}</td>
                                         <td>{{ticket.getFare()|number_format(2,'.',',')}}</td>
-                                        <!--<td>{{ticket.getAgent().getAgentFullName()}}</td>-->
+                                        <!--<td>{% if (ticket.getAgent()!= null) %}{{ticket.getAgent().getAgentFullName()}} {% endif %}</td>-->
                                         <td>{{((ticket.getCommission()/100)*ticket.getFare())|number_format(2,'.',',')}}({{ticket.getCommission()}}%)</td>
                                         <td>{{((ticket.getWitholdingTax()/100)*((ticket.getCommission()/100)*ticket.getFare()))|number_format(2,'.',',')}}({{ticket.getWitholdingTax()}}%)</td>
                                         <td>{{ticket.getServiceCharge()|number_format(2,'.',',')}}</td>
@@ -90,7 +92,6 @@
 {% endblock %}
 {% block script %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ asset('js/ckeditor.js')}}"></script>
     <script type='text/javascript'>
     </script>
 {% endblock %}

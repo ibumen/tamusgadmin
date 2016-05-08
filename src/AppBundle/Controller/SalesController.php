@@ -16,9 +16,9 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\FlightTicket;
 use AppBundle\Form\Type\FlightTicketType;
+use Symfony\Component\Form\FormError;
 
 class SalesController extends Controller {
 
@@ -33,6 +33,10 @@ class SalesController extends Controller {
         $form = $this->createForm(new FlightTicketType(), $flightticket);
         $form->handleRequest($request);
         $flightticket->setUser($this->getUser());
+        if($flightticket->getFare()>$flightticket->getTicketCost()){
+            $form['fare']->addError(new FormError("Fare must not be greater than cost of ticket"));
+        }
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($flightticket);
             $em->flush();

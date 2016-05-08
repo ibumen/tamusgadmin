@@ -9,6 +9,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Description of FlightTicket
@@ -48,12 +49,23 @@ class FlightTicket {
     private $status;
 
     /**
+     * @ORM\Column(name="ticket_cost", type="decimal", precision=11, scale=4)
+     */
+    private $ticketCost;
+
+    /**
      * @ORM\Column(name="fare", type="decimal", precision=11, scale=4)
      */
     private $fare;
 
     /**
      * @ORM\Column(name="commission", type="decimal", precision=5, scale=2, options={"default":0})
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 100,
+     *      minMessage = "A minimum of {{ limit }}% is accepted",
+     *      maxMessage = "A maximum of {{ limit }}% is accepted"
+     * )
      */
     private $commission;
 
@@ -409,14 +421,33 @@ class FlightTicket {
 
     public function computeAmountDue() {
         $fare = $this->getFare();
-        if ($fare == 0) {
-            $this->setAmountDue(0);
-        }
-        $commission = (($this->getCommission() / 100) * $fare);
+        $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
-        $witholding = (($this->getWitholdingTax() / 100) * $commission);
-        $leadway = $this->getLeadwayFee();
-        $this->setAmountDue($fare + $commission + $serviceCharge + $witholding + $leadway);
+
+        $this->setAmountDue($fare + $serviceCharge + $ticketcost);
     }
 
+
+    /**
+     * Set ticketCost
+     *
+     * @param string $ticketCost
+     * @return FlightTicket
+     */
+    public function setTicketCost($ticketCost)
+    {
+        $this->ticketCost = $ticketCost;
+        $this->computeAmountDue();
+        return $this;
+    }
+
+    /**
+     * Get ticketCost
+     *
+     * @return string 
+     */
+    public function getTicketCost()
+    {
+        return $this->ticketCost;
+    }
 }
