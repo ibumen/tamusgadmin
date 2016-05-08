@@ -27,7 +27,7 @@ class FlightTicketType extends AbstractType {
                 ->add("agent", "entity", array('placeholder'=>'Direct Customer', 'required'=>false, 'class' => 'AppBundle:Agent', "choice_label"=>function($agent){ return "[".$agent->getRegNo()."] ".$agent->getAgentFullName("S,f o");}))
                 ->add("commission", "percent", array("scale"=>2, "type"=>"integer", 'required'=>false, "empty_data"=>0, "label" => "Commission", "attr" => array("placeholder" => "Commission")))
                 ->add("witholdingTax", "percent", array("scale"=>2, "type"=>"integer", 'required'=>false, "empty_data"=>0, "label" => "Witholding Tax", "attr" => array("placeholder" => "Witholding Tax")))
-                ->add("leadwayFee", "money", array("currency"=>"NGN", "grouping"=>true, "data"=>1200, "label" => "Leadway Fee", "attr" => array("placeholder" => "Leadway Fee", "disabled"=>TRUE)))
+                ->add("leadwayFee", "money", array("currency"=>"NGN", "grouping"=>true, "data"=>1200, "label" => "Leadway Fee", "attr" => array("placeholder" => "Leadway Fee", "readonly"=>TRUE)))
                 ->add("serviceCharge", "money", array("currency"=>"NGN", "grouping"=>true, 'required'=>false, "empty_data"=>0, "label" => "Service Charge", "attr" => array("placeholder" => "Service Charge")))
                 ->add("Submit", "submit");
     }
