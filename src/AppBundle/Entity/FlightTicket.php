@@ -420,11 +420,10 @@ class FlightTicket {
     }
 
     public function computeAmountDue() {
-        $fare = $this->getFare();
         $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
 
-        $this->setAmountDue($fare + $serviceCharge + $ticketcost);
+        $this->setAmountDue($serviceCharge + $ticketcost);
     }
 
 
