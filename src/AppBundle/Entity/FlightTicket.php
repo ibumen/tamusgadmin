@@ -10,6 +10,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Description of FlightTicket
@@ -35,11 +36,31 @@ class FlightTicket {
 
     /**
      * @ORM\Column(name="pnr", type="string", length=6)
+     * @Assert\Type(
+     *     type="string",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
+     * @Assert\NotNull(
+     *      message="Ticket Number must not be blank"
+     * )
+     * @Assert\NotBlank(
+     *      message="Ticket Number must not be blank"
+     * )
      */
     private $pnr;
 
     /**
      * @ORM\Column(name="ticketno", type="string", length=15, unique=true)
+     * @Assert\Type(
+     *     type="string",
+     *     message="The value {{ value }} is not a valid {{ type }}."
+     * )
+     * @Assert\NotNull(
+     *      message="Ticket Number must not be blank"
+     * )
+     * @Assert\NotBlank(
+     *      message="Ticket Number must not be blank"
+     * )
      */
     private $ticketNo;
 
@@ -50,16 +71,40 @@ class FlightTicket {
 
     /**
      * @ORM\Column(name="ticket_cost", type="decimal", precision=11, scale=4)
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\NotNull(
+     *      message="Cost of ticket must not be blank"
+     * )
+     * @Assert\NotBlank(
+     *      message="Cost of ticket Number must not be blank"
+     * )
      */
     private $ticketCost;
 
     /**
      * @ORM\Column(name="fare", type="decimal", precision=11, scale=4)
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\NotNull(
+     *      message="Fare must not be blank"
+     * )
+     * @Assert\NotBlank(
+     *      message="Fare Number must not be blank"
+     * )
      */
     private $fare;
 
     /**
      * @ORM\Column(name="commission", type="decimal", precision=5, scale=2, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
      * @Assert\Range(
      *      min = 0,
      *      max = 100,
@@ -71,28 +116,69 @@ class FlightTicket {
 
     /**
      * @ORM\Column(name="witholding_tax", type="decimal", precision=5, scale=2, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Range(
+     *      min = 0,
+     *      max = 100,
+     *      minMessage = "A minimum of {{ limit }}% is accepted",
+     *      maxMessage = "A maximum of {{ limit }}% is accepted"
+     * )
      */
     private $witholdingTax;
 
     /**
      * @ORM\Column(name="leadway_fee", type="decimal", precision=11, scale=4)
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\NotNull(
+     *      message="Leadway Fee must not be blank"
+     * )
+     * @Assert\NotBlank(
+     *      message="Leadway Fee must not be blank"
+     * )
      */
     private $leadwayFee;
 
     /**
      * @ORM\Column(name="amount_due", type="decimal", precision=11, scale=4)
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
      */
     private $amountDue;
 
     /**
      * @ORM\Column(name="amount_paid", type="decimal", precision=11, scale=4, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
      */
     private $amountPaid;
 
     /**
      * @ORM\Column(name="service_charge", type="decimal", precision=11, scale=4, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
      */
     private $serviceCharge;
+
+    /**
+     * @ORM\Column(name="refund_charge", type="decimal", precision=11, scale=4, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     */
+    private $refundCharge;
 
     /**
      * @ORM\Column(name="entry_date", type="datetime")
@@ -102,12 +188,20 @@ class FlightTicket {
     /**
      * @ORM\ManyToOne(targetEntity="Agent")
      * @ORM\JoinColumn(name="agentid", referencedColumnName="agentid", nullable=true)
+     * @Assert\Type(
+     *     type="object",
+     *     message="Select a valid agent"
+     * )
      */
     private $agent;
 
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="userid", referencedColumnName="userid", nullable=false)
+     * @Assert\Type(
+     *     type="object",
+     *     message="No attendant selected."
+     * )
      */
     private $user;
 
@@ -119,8 +213,25 @@ class FlightTicket {
         $this->witholdingTax = 0;
         $this->commission = 0;
         $this->serviceCharge = 0;
+        $this->refundCharge=0;
     }
 
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context){
+        if($this->fare > $this->ticketCost){
+            $context->buildViolation('Fare must not be greater than Cost of Ticket')
+                ->atPath('fare')
+                ->addViolation();
+        }
+        if($this->witholdingTax > 50){
+            $context->buildViolation('Too much value allocated for the witholding task')
+                ->atPath('witholdingTax')
+                ->addViolation();
+        }
+    }
+    
     /**
      * Get ticketId
      *
@@ -448,5 +559,28 @@ class FlightTicket {
     public function getTicketCost()
     {
         return $this->ticketCost;
+    }
+
+    /**
+     * Set refundCharge
+     *
+     * @param string $refundCharge
+     * @return FlightTicket
+     */
+    public function setRefundCharge($refundCharge)
+    {
+        $this->refundCharge = $refundCharge;
+
+        return $this;
+    }
+
+    /**
+     * Get refundCharge
+     *
+     * @return string 
+     */
+    public function getRefundCharge()
+    {
+        return $this->refundCharge;
     }
 }

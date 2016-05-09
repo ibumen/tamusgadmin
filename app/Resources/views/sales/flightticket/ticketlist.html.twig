@@ -57,7 +57,7 @@
                                             </a>
 
                                             {% if(ticket.getStatus()!="refunded") %}
-                                                <a href="{{path('removeflightticket', {'id': ticket.getticketId()})}}" title="Add or Remove Payment" class="btn btn-default btn-xs" id='remove'>
+                                                <a href="{{path('addflightticketpayment', {'id': ticket.getticketId()})}}" title="Add or Remove Payment" class="btn btn-default btn-xs" id='remove'>
                                                     <span class="fa fa-minus" aria-hidden="true"></span> <span class="fa fa-money" aria-hidden="true"></span> <span class="fa fa-plus" aria-hidden="true"></span>
                                                 </a>
                                                 {% if(ticket.getStatus()!="not-paid" ) %}
