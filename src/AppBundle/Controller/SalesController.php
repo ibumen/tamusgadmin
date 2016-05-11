@@ -53,7 +53,7 @@ class SalesController extends Controller {
         $form = $this->createFormBuilder($flightticket)
                 ->add("amountPaid", "money", array("currency" => "NGN", "grouping" => true, "label" => "Payment", "attr" => array("placeholder" => "Enter Payment")))
                 ->add('Add', 'submit', array('label' => 'Add Initial Payment'))
-                ->add('Cancel', 'submit', array('label' => 'Cancel Initial Payment'))
+                ->add('Cancel', 'submit', array('label' => 'Skip Payment'))
                 ->getForm();
        
         $form->handleRequest($request);

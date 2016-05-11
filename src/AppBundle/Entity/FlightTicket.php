@@ -534,7 +534,7 @@ class FlightTicket {
         $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
 
-        $this->setAmountDue($serviceCharge + $ticketcost);
+        $this->setAmountDue($serviceCharge + $ticketcost-$this->leadwayFee - $this->commission - $this->witholdingTax);
     }
 
 
