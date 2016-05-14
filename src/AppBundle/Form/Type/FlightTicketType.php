@@ -29,6 +29,7 @@ class FlightTicketType extends AbstractType {
                 ->add("witholdingTax", "percent", array("scale"=>2, "type"=>"integer", 'required'=>false, "empty_data"=>0, "label" => "Witholding Tax", "attr" => array("placeholder" => "Witholding Tax")))
                 ->add("leadwayFee", "money", array("currency"=>"NGN", "grouping"=>true, "data"=>1200, "label" => "Leadway Fee", "attr" => array("placeholder" => "Leadway Fee", "readonly"=>TRUE)))
                 ->add("serviceCharge", "money", array("currency"=>"NGN", "grouping"=>true, 'required'=>false, "empty_data"=>0, "label" => "Service Charge", "attr" => array("placeholder" => "Service Charge")))
+                ->add("amountPaid", "money", array("currency"=>"NGN", "grouping"=>true, 'required'=>false, "empty_data"=>0, "label" => "Amount Paid", "attr" => array("placeholder" => "Amount Paid")))
                 ->add("Submit", "submit");
     }
 
