@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\FlightTicket;
 use AppBundle\Form\Type\FlightTicketType;
-use Symfony\Component\Form\FormError;
+use AppBundle\Form\Type\AddFlightPayment;
 
 class SalesController extends Controller {
 
@@ -28,7 +28,6 @@ class SalesController extends Controller {
     public function addTicketSaleController(Request $request) {
         $formsuccess = false;
         $em = $this->getDoctrine()->getManager();
-        $rep = $em->getRepository("AppBundle:User");
         $flightticket = new FlightTicket();
         $form = $this->createForm(new FlightTicketType(), $flightticket);
         $form->handleRequest($request);
@@ -38,7 +37,6 @@ class SalesController extends Controller {
             $em->flush();
             $form = $this->createForm(new FlightTicketType(), new FlightTicket());
             $formsuccess = true;
-            return $this->redirectToRoute("addflightticketpayment", array("id"=> $flightticket->getTicketId()));
         }
         return $this->render("sales/flightticket/addticket.html.twig", array("pagetitle" => "Add New Ticket Sale", "formsuccess" => $formsuccess, "addticketform" => $form->createView()));
     }
@@ -50,23 +48,22 @@ class SalesController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $rep = $em->getRepository("AppBundle:FlightTicket");
         $flightticket = $rep->find($id);
-        $form = $this->createFormBuilder($flightticket)
-                ->add("amountPaid", "money", array("currency" => "NGN", "grouping" => true, "label" => "Payment", "attr" => array("placeholder" => "Enter Payment")))
-                ->add('Add', 'submit', array('label' => 'Add Initial Payment'))
-                ->add('Cancel', 'submit', array('label' => 'Skip Payment'))
-                ->getForm();
-       
+        $form = $this->createForm(new AddFlightPayment(), $flightticket);
+
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $addaction = $form->get('Add')->isClicked();
-             
-            if ($addaction) {
+            $remaction = $form->get('Remove')->isClicked();
+            if ($remaction) {
+                $flightticket->setAmountPaid($form->get("amountPaid")->getData() * 2 * -1);
+            }
+            if (($addaction || $remaction) && $form->isValid()) {
                 $em->persist($flightticket);
                 $em->flush();
+                return $this->redirectToRoute("listflightticket");
             }
-            return $this->redirectToRoute("listflightticket");
         }
-        return $this->render("sales/flightticket/addpayment.html.twig", array("form" => $form->createView(), "ticket" => $flightticket, "pagetitle"=>"Add Payment"));
+        return $this->render("sales/flightticket/addpayment.html.twig", array("form" => $form->createView(), "ticket" => $flightticket, "pagetitle" => "Add Payment"));
     }
 
     /**

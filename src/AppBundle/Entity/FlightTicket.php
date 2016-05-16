@@ -75,6 +75,10 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
+     * )
      * @Assert\NotNull(
      *      message="Cost of ticket must not be blank"
      * )
@@ -89,6 +93,10 @@ class FlightTicket {
      * @Assert\Type(
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
      * )
      * @Assert\NotNull(
      *      message="Fare must not be blank"
@@ -105,6 +113,10 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
+     *@Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
+     * )
      * @Assert\Range(
      *      min = 0,
      *      max = 100,
@@ -119,6 +131,10 @@ class FlightTicket {
      * @Assert\Type(
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
      * )
      * @Assert\Range(
      *      min = 0,
@@ -135,11 +151,9 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
-     * @Assert\NotNull(
-     *      message="Leadway Fee must not be blank"
-     * )
-     * @Assert\NotBlank(
-     *      message="Leadway Fee must not be blank"
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
      * )
      */
     private $leadwayFee;
@@ -150,6 +164,10 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
+     * )
      */
     private $amountDue;
 
@@ -158,6 +176,10 @@ class FlightTicket {
      * @Assert\Type(
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
      * )
      */
     private $amountPaid;
@@ -168,6 +190,10 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
+     * )
      */
     private $serviceCharge;
 
@@ -176,6 +202,10 @@ class FlightTicket {
      * @Assert\Type(
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
      * )
      */
     private $refundCharge;
@@ -228,6 +258,11 @@ class FlightTicket {
         if($this->witholdingTax > 50){
             $context->buildViolation('Too much value allocated for the witholding task')
                 ->atPath('witholdingTax')
+                ->addViolation();
+        }
+        if($this->amountPaid > $this->amountDue){
+            $context->buildViolation('Excess payment made')
+                ->atPath('amountPaid')
                 ->addViolation();
         }
     }
@@ -485,13 +520,13 @@ class FlightTicket {
         if($this->status=="refunded"){
             return $this;
         }
-        $status = "not-paid";
+        $status = "not_paid";
         $this->amountPaid += $amountPaid;
         if($this->amountPaid==0){
-            $status = "not-paid";
+            $status = "not_paid";
         }else
         if($this->getAmountDue()>$this->getAmountPaid()){
-            $status = "part-paid";
+            $status = "part_paid";
         }else{
             $status = "paid";
         }
