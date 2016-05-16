@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\FlightTicket;
 use AppBundle\Form\Type\FlightTicketType;
 use AppBundle\Form\Type\AddFlightPayment;
+use Symfony\Component\Form\FormError;
 
 class SalesController extends Controller {
 
@@ -53,11 +54,14 @@ class SalesController extends Controller {
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $addaction = $form->get('Add')->isClicked();
-            $remaction = $form->get('Remove')->isClicked();
-            if ($remaction) {
-                $flightticket->setAmountPaid($form->get("amountPaid")->getData() * 2 * -1);
+            if ($addaction) {
+                if ($flightticket->getAmountDue() < ($flightticket->getAmountPaid() + $form->get("amount")->getData())) {
+                    $form->get("amount")->addError(new FormError("Amount may result to excess payment"));
+                } else {
+                    $flightticket->setAmountPaid($form->get("amount")->getData());
+                }
             }
-            if (($addaction || $remaction) && $form->isValid()) {
+            if (($addaction) && $form->isValid()) {
                 $em->persist($flightticket);
                 $em->flush();
                 return $this->redirectToRoute("listflightticket");

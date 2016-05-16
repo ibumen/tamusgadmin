@@ -113,7 +113,7 @@ class FlightTicket {
      *     type="numeric",
      *     message="The value {{ value }} is not a valid number."
      * )
-     *@Assert\Regex(
+     * @Assert\Regex(
      *     pattern="/^[+]?\d*\.?\d*$/",
      *     message="The value is not a valid numeric value"
      * )
@@ -157,32 +157,6 @@ class FlightTicket {
      * )
      */
     private $leadwayFee;
-
-    /**
-     * @ORM\Column(name="amount_due", type="decimal", precision=11, scale=4)
-     * @Assert\Type(
-     *     type="numeric",
-     *     message="The value {{ value }} is not a valid number."
-     * )
-     * @Assert\Regex(
-     *     pattern="/^[+]?\d*\.?\d*$/",
-     *     message="The value is not a valid numeric value"
-     * )
-     */
-    private $amountDue;
-
-    /**
-     * @ORM\Column(name="amount_paid", type="decimal", precision=11, scale=4, options={"default":0})
-     * @Assert\Type(
-     *     type="numeric",
-     *     message="The value {{ value }} is not a valid number."
-     * )
-     * @Assert\Regex(
-     *     pattern="/^[+]?\d*\.?\d*$/",
-     *     message="The value is not a valid numeric value"
-     * )
-     */
-    private $amountPaid;
 
     /**
      * @ORM\Column(name="service_charge", type="decimal", precision=11, scale=4, options={"default":0})
@@ -243,30 +217,61 @@ class FlightTicket {
         $this->witholdingTax = 0;
         $this->commission = 0;
         $this->serviceCharge = 0;
-        $this->refundCharge=0;
+        $this->refundCharge = 0;
     }
+
+    /**
+     * @ORM\Column(name="amount_due", type="decimal", precision=11, scale=4)
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value is not a valid numeric value"
+     * )
+     */
+    private $amountDue;
+
+    /**
+     * @ORM\Column(name="amount_paid", type="decimal", precision=11, scale=4, options={"default":0})
+     * @Assert\Type(
+     *     type="numeric",
+     *     message="The value {{ value }} is not a valid number."
+     * )
+     * @Assert\Regex(
+     *     pattern="/^[+]?\d*\.?\d*$/",
+     *     message="The value {{ value }} is not a valid numeric value"
+     * )
+     */
+    private $amountPaid;
 
     /**
      * @Assert\Callback
      */
-    public function validate(ExecutionContextInterface $context){
-        if($this->fare > $this->ticketCost){
+    public function validate(ExecutionContextInterface $context) {
+        if ($this->fare > $this->ticketCost) {
             $context->buildViolation('Fare must not be greater than Cost of Ticket')
-                ->atPath('fare')
-                ->addViolation();
+                    ->atPath('fare')
+                    ->addViolation();
         }
-        if($this->witholdingTax > 50){
+        if ($this->witholdingTax > 50) {
             $context->buildViolation('Too much value allocated for the witholding task')
-                ->atPath('witholdingTax')
-                ->addViolation();
+                    ->atPath('witholdingTax')
+                    ->addViolation();
         }
-        if($this->amountPaid > $this->amountDue){
-            $context->buildViolation('Excess payment made')
-                ->atPath('amountPaid')
-                ->addViolation();
+        if ($this->amountPaid > $this->amountDue) {
+            $context->buildViolation('Excess payment made ('.$this->amountDue.'/'.$this->amountPaid)
+                    ->atPath('amountPaid')
+                    ->addViolation();
+        }
+        if ($this->amountPaid < 0) {
+            $context->buildViolation('Invalid value ('. $this->amountPaid.') specified for amount paid')
+                    ->atPath('amountPaid')
+                    ->addViolation();
         }
     }
-    
+
     /**
      * Get ticketId
      *
@@ -517,17 +522,18 @@ class FlightTicket {
      * @return FlightTicket
      */
     public function setAmountPaid($amountPaid) {
-        if($this->status=="refunded"){
+        
+        if ($this->status == "refunded") {
             return $this;
         }
         $status = "not_paid";
         $this->amountPaid += $amountPaid;
-        if($this->amountPaid==0){
+        if ($this->amountPaid == 0) {
             $status = "not_paid";
-        }else
-        if($this->getAmountDue()>$this->getAmountPaid()){
+        } else
+        if ($this->getAmountDue() > $this->getAmountPaid()) {
             $status = "part_paid";
-        }else{
+        } else {
             $status = "paid";
         }
         $this->setStatus($status);
@@ -566,21 +572,24 @@ class FlightTicket {
     }
 
     public function computeAmountDue() {
+        static $c=0;
         $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
-
-        $this->setAmountDue($serviceCharge + $ticketcost-$this->leadwayFee - $this->commission - $this->witholdingTax);
+        $fare = $this->getFare();
+        $commission = (($this->commission / 100) * $fare);
+        $c++;
+        //if($c==6)
+        //{var_dump($fare."-fare/".$commission."-comm/".(($this->witholdingTax/100) * $commission)."-witholding"); exit();}
+        $this->setAmountDue($serviceCharge + $ticketcost - $this->leadwayFee - $commission - (($this->witholdingTax/100) * $commission));
     }
 
- 
     /**
      * Set ticketCost
      *
      * @param string $ticketCost
      * @return FlightTicket
      */
-    public function setTicketCost($ticketCost)
-    {
+    public function setTicketCost($ticketCost) {
         $this->ticketCost = $ticketCost;
         $this->computeAmountDue();
         return $this;
@@ -591,8 +600,7 @@ class FlightTicket {
      *
      * @return string 
      */
-    public function getTicketCost()
-    {
+    public function getTicketCost() {
         return $this->ticketCost;
     }
 
@@ -602,8 +610,7 @@ class FlightTicket {
      * @param string $refundCharge
      * @return FlightTicket
      */
-    public function setRefundCharge($refundCharge)
-    {
+    public function setRefundCharge($refundCharge) {
         $this->refundCharge = $refundCharge;
 
         return $this;
@@ -614,8 +621,8 @@ class FlightTicket {
      *
      * @return string 
      */
-    public function getRefundCharge()
-    {
+    public function getRefundCharge() {
         return $this->refundCharge;
     }
+
 }

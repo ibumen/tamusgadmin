@@ -16,16 +16,24 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 class AddFlightPayment extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $data = $builder->getData();
-        $builder->add("amountPaid", "money", array("data"=>  ($data->getAmountDue()- $data->getAmountPaid()), "currency" => "NGN", "grouping" => true, "label" => "Payment", "attr" => array("placeholder" => "Enter Payment")))
+        $builder->add("amount", "money", array("mapped" => false, "data" => ($data->getAmountDue() - $data->getAmountPaid()), "currency" => "NGN", "grouping" => true, "label" => "Payment", "attr" => array("placeholder" => "Enter Payment")))
                 ->add('Add', 'submit', array('label' => 'Add Payment'))
-                ->add('Remove', 'submit', array('label' => 'Remove Payment'))
-                ->add('Cancel', 'submit', array('label' => 'Cancel'));
+                ->add('Cancel', 'submit', array('label' => 'Cancel'))
+                ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                    $form = $event->getForm();
+                    $amt = $form->get("amount")->getData();
+                    $amt = str_replace(",", "", $amt);
+                    $form->get("amount")->setData($amt);
+                }
+        );
     }
 
     public function getName() {
