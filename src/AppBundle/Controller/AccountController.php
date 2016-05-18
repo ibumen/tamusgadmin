@@ -11,7 +11,8 @@ use AppBundle\Form\Type\AgentType;
 use AppBundle\Entity\User;
 use AppBundle\Form\Type\UserType;
 use AppBundle\Entity\UserDetail;
-use AppBundle\Form\Type\UserDetailType;
+use AppBundle\Form\Type\PwdChngFrm;
+use Symfony\Component\Form\FormError;
 
 class AccountController extends Controller {
 
@@ -148,26 +149,66 @@ class AccountController extends Controller {
             return $this->redirectToRoute("homepage");
         }
     }
-    
+
     /**
      * @Route("/account/user/removeuser", name="removeuser")
      */
     public function removeUserAction(Request $request) {
         //if ($request->isXmlHttpRequest()) {
-            $userid = $request->get('userid');
-            $em = $this->getDoctrine()->getManager();
-            $rep = $em->getRepository("AppBundle:User");
-            $user = $rep->find($userid);
-            if ($user == null || $user->getUserDetail()->getStatus() != "not_ready") {
-                return new Response("0");
+        $userid = $request->get('userid');
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository("AppBundle:User");
+        $user = $rep->find($userid);
+        if ($user == null || $user->getUserDetail()->getStatus() != "not_ready") {
+            return new Response("0");
+        }
+        $em->remove($user->getUserDetail());
+        $em->remove($user);
+        $em->flush();
+        return new Response("1");
+        // } else {
+        //      return $this->redirectToRoute("homepage");
+        // }
+    }
+
+    /**
+     * @Route("/account/user/chngpwd", name="changeuserpassword")
+     */
+    public function ChngUserPwdAction(Request $request) {
+        $formsuccess = false;
+        $userid = $this->getUser()->getUserId();
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository("AppBundle:User");
+        $user = $rep->find($userid);
+        if ($user == null) {
+            return $this->redirectToRoute("logout");
+        }
+        $form = $this->createForm(new PwdChngFrm(), $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted()) {
+            $oldpwd = $form->get("oldpwd")->getData();
+            $oldpwd = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
+            $oldpwd2 = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
+            $oldpwd3 = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
+            
+            $newpwd = $form->get("password")->getData();
+            //var_dump($oldpwd ."~~~~".$oldpwd2."~~~~".$oldpwd3); exit();
+            if ($oldpwd != $user->getPassword()) {
+                $form->get("oldpwd")->addError(new FormError("Old password not correct."));
             }
-            $em->remove($user->getUserDetail());
-            $em->remove($user);
-            $em->flush();
-            return new Response("1");
-       // } else {
-      //      return $this->redirectToRoute("homepage");
-       // }
+            if ($newpwd == "default") {
+                $form->get("password")->addError(new FormError("New password must not be the same as the default password"));
+            }
+
+            if ($form->isValid()) {
+                //var_dump("form is valid");exit();
+                $em->persist($user);
+                $em->flush();
+                $formsuccess = true;
+                $form = $this->createForm(new PwdChngFrm(), $user);
+            }
+        }
+        return $this->render("account/user/chngpwd.html.twig", array("pagetitle" => "Change Password", "user" => $user, "form" => $form->createView(), "formsuccess" => $formsuccess));
     }
 
 }

@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+{% block pagecontent %} 
+    <style>
+        #ticketinfo tr td:first-child{
+            text-align: left;
+            font-weight: bold;
+        }
+        #ticketinfo tr td:last-child{
+            text-align: right;
+        }
+    </style>
+    <div class="row"> 
+        <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>{{pagetitle}}</h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <table id="ticketinfo" class="table table-bordered table-condensed table-striped table-responsive">
+                            <tr><td>1</td><td>Tkt No./PNR</td><td>{{ticket.getTicketNo()}}/{{ticket.getPnr()}}</td></tr>
+                            <tr><td>2</td><td>Cost of Ticket</td><td>&#8358;{{ticket.getTicketCost()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>3</td><td>Fare</td><td>&#8358;{{ticket.getFare()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>4</td><td>Commission</td><td>&#8358;{{((ticket.getCommission()/100)*ticket.getFare())|number_format(2,'.',',')}} ({{ticket.getCommission()}}%)</td></tr>
+                            <tr><td>5</td><td>Witholding Tax</td><td>&#8358;{{((ticket.getWitholdingTax()/100)*((ticket.getCommission()/100)*ticket.getFare()))|number_format(2,'.',',')}} ({{ticket.getWitholdingTax()}}%)</td></tr>
+                            <tr><td>6</td><td>Service Charge</td><td>&#8358;{{ticket.getServiceCharge()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>7</td><td>Leadway Fee</td><td>&#8358;{{ticket.getLeadwayFee()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>8</td><td>Tax Ded. (#4 + #5 + #7)</td><td>&#8358;{{ticket.getTaxDeduction()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>9</td><td>Amount-Tax Diff. (#2 + #6 - #8)</td><td>&#8358;{{ticket.getAmountTaxDiff()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>10</td><td>Amount Due (#2 + #6)</td><td>&#8358;{{ticket.getAmountDue()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>11</td><td>Amount Paid</td><td>&#8358;{{ticket.getAmountPaid()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>12</td><td>Balance Due</td><td>&#8358;{{(ticket.getAmountDue()-ticket.getAmountPaid())|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>13</td><td>Agent</td><td>{{(ticket.getAgent()== null)?('Direct Customer'):(ticket.getAgent().getAgentFullName()~ " [" ~ticket.getAgent().getRegNo() ~ "]")}}</td></tr>
+                            <tr><td>14</td><td>Attendant</td><td>{{ticket.getUser().getUserFullName()}}</td></tr>
+                            <tr><td>15</td><td>Payment Status</td><td>{{ticket.getStatus()|humanize}}</td></tr>
+                            {% if(ticket.getStatus()=='refunded') %}
+                                <tr><td>16</td><td>Refund Penalty</td><td>&#8358;{{(ticket.getRefundCharge())|number_format(2,'.',',')}}</td></tr>
+                            {% endif %}
+                            <tr>{% if(ticket.getStatus()=='refunded') %}<td>17</td>{% else %}<td>16</td>{% endif%}<td>Date of Entry</td><td>{{ticket.getEntryDate()|date('d M, Y')}}</td></tr>
+                        </table>
+                        <a href="{{path('listflightticket')}}" title="Back to List" class="btn btn-success btn-xs">
+                            <span class="fa fa-list" aria-hidden="true"></span>
+                        </a>
+                        {% if(ticket.getStatus()!="refunded") %}
+                            <a href="{{path('addflightticketpayment', {'id': ticket.getticketId()})}}" title="Add or Remove Payment" class="btn btn-default btn-xs" id='remove'>
+                                <span class="fa fa-minus" aria-hidden="true"></span> <span class="fa fa-money" aria-hidden="true"></span> <span class="fa fa-plus" aria-hidden="true"></span>
+                            </a>
+                            {% if(ticket.getStatus()!="not-paid" ) %}
+                                <a href="{{path('flightticketrefund', {'id': ticket.getticketId()})}}" title="Cancel and Refund Payment" class="btn btn-danger btn-xs">
+                                    <span class="fa fa-undo" aria-hidden="true"></span>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        {% if(ticket.getStatus()=="not-paid") %}
+                            <a href="{{path('removeflightticket', {'id': ticket.getticketId()})}}" title="Cancel Ticket" class="btn btn-danger btn-xs" id='remove'>
+                                <span class="fa fa-trash" aria-hidden="true"></span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block script %}
+    {{ parent() }}
+    <script type='text/javascript'>
+    </script>
+{% endblock %}

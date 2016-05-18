@@ -212,26 +212,12 @@ class FlightTicket {
     public function __construct() {
         $this->status = "not_paid";
         $this->entryDate = new \DateTime();
-        $this->amountDue = 0;
         $this->amountPaid = 0;
         $this->witholdingTax = 0;
         $this->commission = 0;
         $this->serviceCharge = 0;
         $this->refundCharge = 0;
     }
-
-    /**
-     * @ORM\Column(name="amount_due", type="decimal", precision=11, scale=4)
-     * @Assert\Type(
-     *     type="numeric",
-     *     message="The value {{ value }} is not a valid number."
-     * )
-     * @Assert\Regex(
-     *     pattern="/^[+]?\d*\.?\d*$/",
-     *     message="The value is not a valid numeric value"
-     * )
-     */
-    private $amountDue;
 
     /**
      * @ORM\Column(name="amount_paid", type="decimal", precision=11, scale=4, options={"default":0})
@@ -260,13 +246,13 @@ class FlightTicket {
                     ->atPath('witholdingTax')
                     ->addViolation();
         }
-        if ($this->amountPaid > $this->amountDue) {
-            $context->buildViolation('Excess payment made ('.$this->amountDue.'/'.$this->amountPaid)
+        if ($this->amountPaid > $this->getAmountDue()) {
+            $context->buildViolation('Excess payment made (' . $this->getAmountDue() . '/' . $this->amountPaid)
                     ->atPath('amountPaid')
                     ->addViolation();
         }
         if ($this->amountPaid < 0) {
-            $context->buildViolation('Invalid value ('. $this->amountPaid.') specified for amount paid')
+            $context->buildViolation('Invalid value (' . $this->amountPaid . ') specified for amount paid')
                     ->atPath('amountPaid')
                     ->addViolation();
         }
@@ -418,7 +404,6 @@ class FlightTicket {
      */
     public function setFare($fare) {
         $this->fare = $fare;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -439,7 +424,6 @@ class FlightTicket {
      */
     public function setCommission($commission) {
         $this->commission = $commission;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -460,7 +444,6 @@ class FlightTicket {
      */
     public function setWitholdingTax($witholdingTax) {
         $this->witholdingTax = $witholdingTax;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -481,7 +464,6 @@ class FlightTicket {
      */
     public function setLeadwayFee($leadwayFee) {
         $this->leadwayFee = $leadwayFee;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -495,34 +477,13 @@ class FlightTicket {
     }
 
     /**
-     * Set amountDue
-     *
-     * @param string $amountDue
-     * @return FlightTicket
-     */
-    public function setAmountDue($amountDue) {
-        $this->amountDue = $amountDue;
-
-        return $this;
-    }
-
-    /**
-     * Get amountDue
-     *
-     * @return string 
-     */
-    public function getAmountDue() {
-        return $this->amountDue;
-    }
-
-    /**
      * Set amountPaid
      *
      * @param string $amountPaid
      * @return FlightTicket
      */
     public function setAmountPaid($amountPaid) {
-        
+
         if ($this->status == "refunded") {
             return $this;
         }
@@ -558,7 +519,6 @@ class FlightTicket {
      */
     public function setServiceCharge($serviceCharge) {
         $this->serviceCharge = $serviceCharge;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -571,16 +531,28 @@ class FlightTicket {
         return $this->serviceCharge;
     }
 
-    public function computeAmountDue() {
-        static $c=0;
+    public function getAmountDue() {
+        $ticketcost = $this->getTicketCost();
+        $serviceCharge = $this->getServiceCharge();
+        return(($serviceCharge + $ticketcost));
+    }
+
+    public function getTaxDeduction() {
+
+        $fare = $this->getFare();
+        $commission = (($this->commission / 100) * $fare);
+
+        return ($commission + (($this->witholdingTax / 100) * $commission) + $this->leadwayFee);
+    }
+
+    public function getAmountTaxDiff() {
+
         $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
         $fare = $this->getFare();
         $commission = (($this->commission / 100) * $fare);
-        $c++;
-        //if($c==6)
-        //{var_dump($fare."-fare/".$commission."-comm/".(($this->witholdingTax/100) * $commission)."-witholding"); exit();}
-        $this->setAmountDue($serviceCharge + $ticketcost - $this->leadwayFee - $commission - (($this->witholdingTax/100) * $commission));
+
+        return ($serviceCharge + $ticketcost - $this->getTaxDeduction());
     }
 
     /**
@@ -591,7 +563,6 @@ class FlightTicket {
      */
     public function setTicketCost($ticketCost) {
         $this->ticketCost = $ticketCost;
-        $this->computeAmountDue();
         return $this;
     }
 
@@ -612,6 +583,7 @@ class FlightTicket {
      */
     public function setRefundCharge($refundCharge) {
         $this->refundCharge = $refundCharge;
+        $this->setStatus("refunded");
 
         return $this;
     }

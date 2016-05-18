@@ -52,7 +52,7 @@
                                         <!--<td>{{ticket.getUser().getUserFullName()}}</td>-->
                                         <td>{{ticket.getStatus()|humanize|capitalize}}</td>
                                         <td>
-                                            <a href="{{path('f', {'id': ticket.getticketId()})}}" title="View Ticket Details" class="btn btn-success btn-xs" id='remove'>
+                                            <a href="{{path('flightticketdetail', {'id': ticket.getticketId()})}}" title="View Ticket Details" class="btn btn-success btn-xs" id='remove'>
                                                 <span class="fa fa-eye" aria-hidden="true"></span>
                                             </a>
 
@@ -60,13 +60,13 @@
                                                 <a href="{{path('addflightticketpayment', {'id': ticket.getticketId()})}}" title="Add or Remove Payment" class="btn btn-default btn-xs" id='remove'>
                                                     <span class="fa fa-minus" aria-hidden="true"></span> <span class="fa fa-money" aria-hidden="true"></span> <span class="fa fa-plus" aria-hidden="true"></span>
                                                 </a>
-                                                {% if(ticket.getStatus()!="not-paid" ) %}
-                                                    <a href="{{path('f', {'id': ticket.getticketId()})}}" title="Cancel and Refund Payment" class="btn btn-danger btn-xs">
+                                                {% if(ticket.getStatus()!="not_paid" ) %}
+                                                    <a href="{{path('flightticketrefund', {'id': ticket.getticketId()})}}" title="Cancel and Refund Payment" class="btn btn-danger btn-xs">
                                                         <span class="fa fa-undo" aria-hidden="true"></span>
                                                     </a>
                                                 {% endif %}
                                             {% endif %}
-                                            {% if(ticket.getStatus()=="not-paid") %}
+                                            {% if(ticket.getStatus()=="not_paid") %}
                                                 <a href="{{path('removeflightticket', {'id': ticket.getticketId()})}}" title="Cancel Ticket" class="btn btn-danger btn-xs" id='remove'>
                                                     <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                                 </a>

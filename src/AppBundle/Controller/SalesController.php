@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Entity\FlightTicket;
 use AppBundle\Form\Type\FlightTicketType;
 use AppBundle\Form\Type\AddFlightPayment;
+use AppBundle\Form\Type\FlightRefundPenalty;
 use Symfony\Component\Form\FormError;
 
 class SalesController extends Controller {
@@ -46,6 +47,7 @@ class SalesController extends Controller {
      * @Route("/sales/flight/ticket/addpayment/{id}", name="addflightticketpayment")
      */
     public function addFTPaymentController(Request $request, $id) {
+        $ref = $request->headers->get('referer');
         $em = $this->getDoctrine()->getManager();
         $rep = $em->getRepository("AppBundle:FlightTicket");
         $flightticket = $rep->find($id);
@@ -67,7 +69,7 @@ class SalesController extends Controller {
                 return $this->redirectToRoute("listflightticket");
             }
         }
-        return $this->render("sales/flightticket/addpayment.html.twig", array("form" => $form->createView(), "ticket" => $flightticket, "pagetitle" => "Add Payment"));
+        return $this->render("sales/flightticket/addpayment.html.twig", array("ref" => $ref, "form" => $form->createView(), "ticket" => $flightticket, "pagetitle" => "Add Payment"));
     }
 
     /**
@@ -80,6 +82,41 @@ class SalesController extends Controller {
         if ($ticket != NULL) {
             $em->remove($ticket);
             $em->flush();
+        }
+        return $this->redirectToRoute("listflightticket");
+    }
+
+    /**
+     * @Route("/sales/flight/ticket/view/{id}", name="flightticketdetail")
+     */
+    public function FlightTicketDetailController(Request $request, $id) {
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository("AppBundle:FlightTicket");
+        $ticket = $rep->find($id);
+        if ($ticket != NULL) {
+            return $this->render("sales/flightticket/flightticketdetail.html.twig", array("ticket" => $ticket, "pagetitle" => "Flight Ticket Detail"));
+        }
+        return $this->redirectToRoute("listflightticket");
+    }
+
+    /**
+     * @Route("/sales/flight/ticket/refund/{id}", name="flightticketrefund")
+     */
+    public function FlightTicketRefundController(Request $request, $id) {
+        $ref = $request->headers->get('referer');
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository("AppBundle:FlightTicket");
+        $ticket = $rep->find($id);
+        if ($ticket != NULL) {
+            $form = $this->createForm(new FlightRefundPenalty(), $ticket);
+            $form->handleRequest($request);
+            $ticket->setRefundCharge($form->get("amount")->getData());
+            if ($form->isValid()) {
+                $em->persist($ticket);
+                $em->flush();
+                return $this->redirectToRoute("flightticketdetail", array("id"=>$id));
+            }
+            return $this->render("sales/flightticket/flightticketrefund.html.twig", array("ref"=>$ref, "ticket" => $ticket, "form"=>$form->createView(), "pagetitle" => "Flight Ticket Refund"));
         }
         return $this->redirectToRoute("listflightticket");
     }
