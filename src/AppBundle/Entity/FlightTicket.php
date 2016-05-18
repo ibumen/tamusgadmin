@@ -542,7 +542,7 @@ class FlightTicket {
         $fare = $this->getFare();
         $commission = (($this->commission / 100) * $fare);
 
-        return ($commission + (($this->witholdingTax / 100) * $commission) + $this->leadwayFee);
+        return ($commission - ((($this->witholdingTax / 100) * $commission) + $this->leadwayFee));
     }
 
     public function getAmountTaxDiff() {
