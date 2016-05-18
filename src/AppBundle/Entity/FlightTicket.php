@@ -549,10 +549,8 @@ class FlightTicket {
 
         $ticketcost = $this->getTicketCost();
         $serviceCharge = $this->getServiceCharge();
-        $fare = $this->getFare();
-        $commission = (($this->commission / 100) * $fare);
-
-        return ($serviceCharge + $ticketcost - $this->getTaxDeduction());
+        $tx = ($this->getTaxDeduction()<$this->getLeadwayFee())?($this->leadwayFee):($this->getTaxDeduction());
+        return ($serviceCharge + $ticketcost - $tx);
     }
 
     /**
