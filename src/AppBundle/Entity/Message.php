@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Message {
     /* Constants for status */
 
-    const STATUS = array("read", "unread", "replied");
+    private $STATUS = array("read", "unread", "replied");
 
     /**
      * @ORM\Id

@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class FlightTicket {
     /* Constants for Enum type */
 
-    const STATUS = array("not_paid", "part_paid", "paid", "refunded");
+    private $STATUS = array("not_paid", "part_paid", "paid", "refunded");
 
     /**
      * @ORM\Id
