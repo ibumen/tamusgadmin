@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class UserDetail {
     /* Constants for Status */
 
-    private $STATUS = array("active", "dormant", "not_ready");
+    private $E_STATUS = array("active", "dormant", "not_ready");
 
     /**
      * @ORM\Id

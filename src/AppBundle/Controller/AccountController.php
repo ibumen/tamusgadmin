@@ -187,13 +187,10 @@ class AccountController extends Controller {
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $oldpwd = $form->get("oldpwd")->getData();
-            $oldpwd = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
-            $oldpwd2 = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
-            $oldpwd3 = password_hash("admin", PASSWORD_BCRYPT, ["cost" => 12]);
             
             $newpwd = $form->get("password")->getData();
-            //var_dump($oldpwd ."~~~~".$oldpwd2."~~~~".$oldpwd3); exit();
-            if ($oldpwd != $user->getPassword()) {
+           
+            if (!password_verify($oldpwd, $user->getPassword())) {
                 $form->get("oldpwd")->addError(new FormError("Old password not correct."));
             }
             if ($newpwd == "default") {
@@ -202,6 +199,7 @@ class AccountController extends Controller {
 
             if ($form->isValid()) {
                 //var_dump("form is valid");exit();
+                $user->setPassword($newpwd);
                 $em->persist($user);
                 $em->flush();
                 $formsuccess = true;

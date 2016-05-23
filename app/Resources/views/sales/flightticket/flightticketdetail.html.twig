@@ -33,9 +33,9 @@
                             <tr><td>5</td><td>Witholding Tax</td><td>&#8358;{{((ticket.getWitholdingTax()/100)*((ticket.getCommission()/100)*ticket.getFare()))|number_format(2,'.',',')}} ({{ticket.getWitholdingTax()}}%)</td></tr>
                             <tr><td>6</td><td>Service Charge</td><td>&#8358;{{ticket.getServiceCharge()|number_format(2,'.',',')}}</td></tr>
                             <tr><td>7</td><td>Leadway Fee</td><td>&#8358;{{ticket.getLeadwayFee()|number_format(2,'.',',')}}</td></tr>
-                            <tr><td>8</td><td>Tax Ded. (#4 + #5 + #7)</td><td>&#8358;{{ticket.getTaxDeduction()|number_format(2,'.',',')}}</td></tr>
-                            <tr><td>9</td><td>Amount-Tax Diff. (#2 + #6 - #8)</td><td>&#8358;{{ticket.getAmountTaxDiff()|number_format(2,'.',',')}}</td></tr>
-                            <tr><td>10</td><td>Amount Due (#2 + #6)</td><td>&#8358;{{ticket.getAmountDue()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>8</td><td>Tax Ded.</td><td>&#8358;{{ticket.getTaxDeduction()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>9</td><td>Amount-Tax Diff.</td><td>&#8358;{{ticket.getAmountTaxDiff()|number_format(2,'.',',')}}</td></tr>
+                            <tr><td>10</td><td>Amount Due</td><td>&#8358;{{ticket.getAmountDue()|number_format(2,'.',',')}}</td></tr>
                             <tr><td>11</td><td>Amount Paid</td><td>&#8358;{{ticket.getAmountPaid()|number_format(2,'.',',')}}</td></tr>
                             <tr><td>12</td><td>Balance Due</td><td>&#8358;{{(ticket.getAmountDue()-ticket.getAmountPaid())|number_format(2,'.',',')}}</td></tr>
                             <tr><td>13</td><td>Agent</td><td>{{(ticket.getAgent()== null)?('Direct Customer'):(ticket.getAgent().getAgentFullName()~ " [" ~ticket.getAgent().getRegNo() ~ "]")}}</td></tr>

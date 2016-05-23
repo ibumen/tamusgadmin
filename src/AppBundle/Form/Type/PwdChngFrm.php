@@ -21,7 +21,7 @@ class PwdChngFrm extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options) {
         $builder->add("oldpwd", "password", array("label" => "Old Password", "mapped"=>false, "attr" => array("placeholder" => "Old Password")))
-                ->add("password", "password", array("label"=> "New Password", "attr"=> array("placeholder"=>"New Password")))
+                ->add("password", "password", array("label"=> "New Password", "mapped"=>false, "attr"=> array("placeholder"=>"New Password")))
                 ->add("Submit", "submit");
         
     }

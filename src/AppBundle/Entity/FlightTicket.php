@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class FlightTicket {
     /* Constants for Enum type */
 
-    private $STATUS = array("not_paid", "part_paid", "paid", "refunded");
+    private $E_STATUS = array("not_paid", "part_paid", "paid", "refunded");
 
     /**
      * @ORM\Id
@@ -316,7 +316,7 @@ class FlightTicket {
      * @return FlightTicket
      */
     public function setStatus($status) {
-        if (in_array($status, self::STATUS)) {
+        if (in_array($status, $this->E_STATUS)) {
             $this->status = $status;
             return $this;
         } else {

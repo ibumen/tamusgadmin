@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Agent {
     /* Constants for Status */
 
-    private $STATUS = array("active", "dormant");
+    private $E_STATUS = array("active", "dormant");
 
     /**
      * @ORM\Id

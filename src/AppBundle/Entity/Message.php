@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Message {
     /* Constants for status */
 
-    private $STATUS = array("read", "unread", "replied");
+    private $E_STATUS = array("read", "unread", "replied");
 
     /**
      * @ORM\Id
@@ -58,6 +58,9 @@ class Message {
     private $messageStatus;
 
 
+    public function __construct() {
+        $this->messageStatus= "unread";
+    }
     /**
      * Get messageId
      *

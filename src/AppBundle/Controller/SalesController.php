@@ -21,8 +21,9 @@ use AppBundle\Form\Type\FlightTicketType;
 use AppBundle\Form\Type\AddFlightPayment;
 use AppBundle\Form\Type\FlightRefundPenalty;
 use Symfony\Component\Form\FormError;
+use AppBundle\Controller\UserValidationController;
 
-class SalesController extends Controller {
+class SalesController extends Controller implements UserValidationController {
 
     /**
      * @Route("/sales/flight/ticket/add", name="addflightticket")
@@ -143,6 +144,10 @@ class SalesController extends Controller {
      */
     public function modifyTicketSaleController(Request $request) {
         
+    }
+    
+    public function publicRedirectToRoute(){
+        return $this->redirectToRoute("changeuserpassword");
     }
 
 }
