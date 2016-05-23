@@ -8,6 +8,11 @@ services:
         class: AppBundle\EventListener\TamusgenRequestListener
         tags:
             - {name: kernel.event_listener, event: kernel.controller, method: onKernelController}
+    kernel.listener.requesteventlistener:
+        class: AppBundle\EventListener\RequestEventListener
+        tags:
+            - {name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
+        arguments: [ @router, @service_container] 
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]

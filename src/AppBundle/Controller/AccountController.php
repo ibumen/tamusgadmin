@@ -200,6 +200,8 @@ class AccountController extends Controller {
             if ($form->isValid()) {
                 //var_dump("form is valid");exit();
                 $user->setPassword($newpwd);
+                $user->getUserDetail()->setStatus("active");
+                $em->persist($user->getUserDetail());
                 $em->persist($user);
                 $em->flush();
                 $formsuccess = true;
