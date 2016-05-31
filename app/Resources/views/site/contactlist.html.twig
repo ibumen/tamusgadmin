@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block pagecontent %}
+    <div class="row"> 
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>Site Page <small>{{pagetitle}}</small></h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='viewmode'>
+                        <div class="row">
+                            {% for contact in contactlist %}     
+                                <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                    <div class="well profile_view">
+                                        <div class="col-sm-12">
+                                            <h4 class="brief"><i>{{contact.getState().getStatename()}} Office</i></h4>
+                                            <div class="left col-xs-12">
+                                                <p>{{ contact.getAddress()}}</p>
+                                                <ul class="list-unstyled">
+                                                    {% set phones = contact.getPhones() %}
+                                                    {% for phone in phones %}
+                                                        <li><i class="fa fa-phone"></i> Phone: 
+                                                            {{ phone.getPhoneNo()}}
+                                                            {% if (phone.getCallFrom() is not null and phone.getCallTo() is not null) %}
+                                                                ({{phone.getCallFrom()}} - {{ phone.getCallTo()}})
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endfor %}
+                                                    {% set emails = contact.getEmails() %}
+                                                    {% for email in emails %}
+                                                        <li><i class="fa fa-envelope-o"></i> Email: {{email.getEmail()}}</li>
+                                                        {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12 bottom animated bounceInUp text-right" style="margin-top:5px;">
+                                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12 emphasis">
+                                                <button type="button" class="btn btn-primary btn-xs"> <i class="fa fa-edit"></i> Edit </button>
+                                                <button type="button" class="btn btn-danger btn-xs"> <i class="fa fa-trash"></i> Remove </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <div class="col-md-4 col-sm-4 col-xs-12 animated fadeInDown">
+                                <div class="well profile_view text-center">
+                                    <div class="col-sm-12">
+                                        <a href="{{path('addcontact')}}" style="font-size: 100px;" title="Add New Contact"><i class="fa fa-plus"></i> </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

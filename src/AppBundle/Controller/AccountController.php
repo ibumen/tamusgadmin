@@ -187,9 +187,9 @@ class AccountController extends Controller {
         $form->handleRequest($request);
         if ($form->isSubmitted()) {
             $oldpwd = $form->get("oldpwd")->getData();
-            
+
             $newpwd = $form->get("password")->getData();
-           
+
             if (!password_verify($oldpwd, $user->getPassword())) {
                 $form->get("oldpwd")->addError(new FormError("Old password not correct."));
             }
@@ -209,6 +209,17 @@ class AccountController extends Controller {
             }
         }
         return $this->render("account/user/chngpwd.html.twig", array("pagetitle" => "Change Password", "user" => $user, "form" => $form->createView(), "formsuccess" => $formsuccess));
+    }
+
+    /**
+     * @Route("/account/user/myaccount", name="myaccount")
+     */
+    public function MyAccountAction(Request $request) {
+       $user = $this->getUser();
+        if ($user == null) {
+            return $this->redirectToRoute("login");
+        }
+       return $this->render("account/user/myaccount.html.twig", array("pagetitle"=>"My Account", "user"=>$user));
     }
 
 }

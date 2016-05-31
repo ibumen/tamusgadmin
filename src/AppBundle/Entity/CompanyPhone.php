@@ -35,12 +35,12 @@ class CompanyPhone {
     private $phoneNo;
 
     /**
-     * @ORM\Column(name="callfrom", type="time")
+     * @ORM\Column(name="callfrom", type="time", nullable=true)
      */
     private $callFrom;
 
     /**
-     * @ORM\Column(name="callto", type="time")
+     * @ORM\Column(name="callto", type="time", nullable=true)
      */
     private $callTo;
 

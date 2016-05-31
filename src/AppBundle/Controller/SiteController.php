@@ -22,6 +22,8 @@ use AppBundle\Form\Type\PartnerType;
 use AppBundle\Entity\Partner;
 use AppBundle\Form\Type\ClientType;
 use AppBundle\Entity\Client;
+use AppBundle\Entity\CompanyContact;
+use AppBundle\Form\Type\CompanyContactType;
 
 class SiteController extends Controller {
 
@@ -192,6 +194,31 @@ class SiteController extends Controller {
             return new Response("1");
         }
         return new Response("0");
+    }
+
+    /**
+     * @Route("/site/contact", name="companycontact")
+     */
+    public function contactAction(Request $request) {
+        $em = $this->getDoctrine()->getManager();
+        $rep = $em->getRepository("AppBundle:CompanyContact");
+        $contacts  =$rep->findAll();
+        //$form = $this->createForm(new ClientType(), $client);
+        //$form->handleRequest($request);
+//        if ($form->isValid()) {
+//            $em->persist($client);
+//            $em->flush();
+//            return new Response("1");
+//        }
+        return $this->render('site/contactlist.html.twig', array("pagetitle"=>"Contacts", "contactlist" => $contacts));
+    }
+    /**
+     * @Route("/site/addcontact", name="addcontact")
+     */
+    public function addContactAction(Request $request) {
+        $contact = new CompanyContact();
+        $form = $this->createForm(new CompanyContactType(), $contact);
+        return $this->render('site/addcontact.html.twig', array("pagetitle"=>"New Contact", "form" => $form->createView()));
     }
 
 }

@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+{% block pagecontent %}           
+    <div class="row"> 
+        <div class="col-md-6 col-sm-12 col-xs-12">
+            <div class="dashboard_graph">
+
+                <div class="row x_title">
+                    <div class="col-md-6">
+                        <h3>{{pagetitle}}</h3>
+                    </div>
+                    <div class="col-md-6">
+
+                    </div>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12" id='partnerlist'>
+                        {{form(form)}}
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
+{% block script %}
+    {{ parent() }}
+    <script type='text/javascript'>
+        emailcount = 0;
+        phonecount = 0;
+        var email_prototyper = $("#companycontactfrm_emails");
+        var phone_prototyper = $("#companycontactfrm_phones");
+        function addEmail() {
+            email_prototype = email_prototyper.data("prototype");
+
+            email_prototype = email_prototype.replace(/.*<input/g, "<div class='form-group'><input");
+            email_prototype = email_prototype.replace(/\"form-control\">.*/g, "'form-control'></div>");
+            email_prototype = email_prototype.replace(/__name__/g, emailcount);
+
+            email_prototyper.append(email_prototype);
+            emailcount++;
+        }
+        function addPhone() {
+            phone_prototype = phone_prototyper.data("prototype");
+
+            phone_prototype = phone_prototype.replace(/__name__label__/g, "Phone #" + (phonecount+1));
+            phone_prototype = phone_prototype.replace(/__name__/g, phonecount);
+
+            phone_prototyper.append(phone_prototype);
+            phonecount++;
+        }
+        $(document).on("click", "#companycontactfrm_add_email", function () {
+            addEmail();
+        });
+        $(document).on("click", "#companycontactfrm_add_phone", function () {
+            addPhone();
+        });
+        addEmail();addPhone();
+    </script>
+{% endblock %}

@@ -9,6 +9,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Description of CompanyContact
@@ -28,10 +29,6 @@ class CompanyContact {
      * @ORM\GeneratedValue
      */
     private $addrId;
-    /*
-     * @ORM\Column(name="name", type="string", length=150, unique=true)
-     */
-    private $name;
 
     /**
      * @ORM\Column(name="address", type="string", length=500)
